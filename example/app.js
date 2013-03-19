@@ -51,7 +51,7 @@ function createImageWrapper(photo){
 	// })
 	// row.add(view);
 	
-	var data = JSON.parse(photoList.getExifData(photo.path));
+	var data = photoList.getExifData(photo.path);//JSON.parse(photoList.getExifData(photo.path));
 	
 	// image.width = data['width'];
 	// image.height = data['height'];
@@ -63,6 +63,7 @@ function createImageWrapper(photo){
 		data['lon'] = gpsConvert(data['lon']);
 	}
 	
+	Ti.API.info("lat : " + data['lat'] + " / lon : " + data['lon'])
 	Ti.API.info(data.date + " " + data.time);
 	Ti.API.info(photo.date);
 	// Ti.API.info(new Date(parseInt(obj.date));
@@ -94,11 +95,12 @@ if (Ti.Platform.name == "android") {
 	// photoList = photoList.createExample({});
 	
 	// Ti.API.info(photoList.getPhotos(null, null))
-	var photos = JSON.parse(photoList.getPhotos(0, 5));
+	var photos = photoList.getPhotos(0, 5);
+	// Ti.API.info(photoList.getPhotos(0, 5));
 	Ti.API.info("paths' length >>> " + photos.length)
 	for(var i in photos) {
-		// Ti.API.info(paths[i]);
-		createImageWrapper(JSON.parse(photos[i]));
+		// Ti.API.info(JSON.parse(photos[i]));
+		createImageWrapper(photos[i]);
 	}
 	
 }

@@ -10,6 +10,7 @@ package com.oxgcp.photoList;
 
 import com.google.gson.Gson;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ public class PhotolistModule extends KrollModule
 	}
 	
 	@Kroll.method
-	public String getPhotos(Integer date, Integer limit)
+	public KrollDict getPhotos(Integer date, Integer limit)
 	{
 		Uri externalPhotosUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 		// Uri internalPhotosUri = MediaStore.Images.Media.INTERNAL_CONTENT_URI;
@@ -86,6 +87,7 @@ public class PhotolistModule extends KrollModule
 		String[] where = { date.toString() };
 		
 		HashMap<String, String> obj = new HashMap<String, String>();
+		// HashMap<String, KrollDict> photos = new HashMap<String, KrollDict>();
 		// KrollDict dict;
 		
 		// String[] projection = new String[]{
@@ -99,21 +101,22 @@ public class PhotolistModule extends KrollModule
 			// null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC WHERE " + MediaStore.Images.ImageColumns._ID + " > " + id + " LIMIT " + limit);
 		// Cursor internalList = activity.managedQuery(internalPhotosUri, null, null, null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
 		
-		ArrayList<String> arrayList = new ArrayList<String>();
+		// ArrayList<String> arrayList = new ArrayList<String>();
+		KrollDict arrayList = new KrollDict(externalList.getCount());
 		
 		externalList.moveToFirst();
 		// internalList.moveToFirst();
 		
 		Log.d("TiAPI", "externalList's count: " + externalList.getCount());
 		if (externalList.getCount() > 0){
-			while(!externalList.isAfterLast()) {
+			for(Integer i=0;!externalList.isAfterLast();i++) {
 					
 					obj.put("path", externalList.getString(externalList.getColumnIndex(MediaStore.MediaColumns.DATA)));
 					obj.put("date", externalList.getString(externalList.getColumnIndex(MediaStore.Images.ImageColumns.DATE_TAKEN)));
 					
 					// dict = new KrollDict(obj);
 					
-					arrayList.add(new JSONObject(obj).toString()); //add the item
+					arrayList.put(i.toString(), new KrollDict(obj)); //add the item
 					externalList.moveToNext();
 			}
 		}
@@ -126,11 +129,11 @@ public class PhotolistModule extends KrollModule
 		// 	}
 		// }
 		
-		return gson.toJson(arrayList);
+		return arrayList;//gson.toJson(arrayList);
 	}
 	
 	@Kroll.method
-	public String getExifData(String fileName)
+	public KrollDict getExifData(String fileName)
 	{
 		try {
 			ExifInterface exif = new ExifInterface(fileName);
@@ -149,7 +152,7 @@ public class PhotolistModule extends KrollModule
 			tag.put("date", exif.getAttribute("GPSDateStamp"));
 			tag.put("time", exif.getAttribute("GPSTimeStamp"));
 
-			return new JSONObject(tag).toString();
+			return new KrollDict(tag);//new JSONObject(tag).toString();
 		}
 		catch(Exception e){
 			return null;
